@@ -11,6 +11,8 @@ public class ConfigVerification {
         if (plugin.getConfig().get("whitelist") == null) plugin.getConfig().set("whitelist", new String[] {});
         if (plugin.getConfig().get("playerBypass") == null) plugin.getConfig().set("playerBypass", new String[] {});
         if (plugin.getConfig().get("reversePlayerBypass") == null) plugin.getConfig().set("reversePlayerBypass", false);
+        if (plugin.getConfig().get("checkLuckPerms") == null) plugin.getConfig().set("checkLuckPerms", false);
+        if (plugin.getConfig().get("luckPermsBypassRoles") == null) plugin.getConfig().set("luckPermsBypassRoles", new String[] {"admin", "moderator", "vip"});
         if (plugin.getConfig().get("disablePieChart") == null) plugin.getConfig().set("disablePieChart", false);
         plugin.saveConfig();
         plugin.reloadConfig();

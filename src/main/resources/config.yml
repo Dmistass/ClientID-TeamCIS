@@ -25,5 +25,14 @@ playerBypass:
 # When true, playerBypass will force only players in the list to have the mod, acting as a blacklist rather than a whitelist
 reversePlayerBypass: false
 
+# Whether to check LuckPerms roles for bypass permissions
+checkLuckPerms: false
+
+# List of LuckPerms roles that can bypass mod checks
+luckPermsBypassRoles:
+  - admin
+  - moderator
+  - vip
+
 # Whether the pie chart should be disabled for players when they join
 disablePieChart: false

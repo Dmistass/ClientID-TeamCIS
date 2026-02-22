@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.novinitygames.clientIDServer.ClientIDServer;
 import com.novinitygames.clientIDServer.utils.GeyserUtils;
+import com.novinitygames.clientIDServer.utils.LuckPermsUtils;
 import com.novinitygames.clientIDServer.utils.UpdateChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -23,16 +24,38 @@ public class PlayerConnectionListeners implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         boolean isGeyser = false;
+        
+        // Check if Geyser-Spigot plugin exists before using it
         if (ClientIDServer.getInstance().getServer().getPluginManager().getPlugin("Geyser-Spigot") != null) {
             isGeyser = GeyserUtils.isGeyserPlayer(player);
         }
+        
         if (isGeyser) {
             ClientIDServer.getInstance().getLogger().info(event.getPlayer().getName() + " is a Bedrock player. Ignoring.");
         }
-        if (
-                (ClientIDServer.getInstance().getConfig().getStringList("playerBypass").contains(player.getName()) && !ClientIDServer.getInstance().getConfig().getBoolean("reversePlayerBypass", false))
-                || (!ClientIDServer.getInstance().getConfig().getStringList("playerBypass").contains(player.getName()) && ClientIDServer.getInstance().getConfig().getBoolean("reversePlayerBypass", false))
-                        || isGeyser) {
+        
+        // Check if player should bypass mod checks
+        boolean shouldBypass = false;
+        
+        // Check player bypass list
+        if ((ClientIDServer.getInstance().getConfig().getStringList("playerBypass").contains(player.getName()) && !ClientIDServer.getInstance().getConfig().getBoolean("reversePlayerBypass", false))
+                || (!ClientIDServer.getInstance().getConfig().getStringList("playerBypass").contains(player.getName()) && ClientIDServer.getInstance().getConfig().getBoolean("reversePlayerBypass", false))) {
+            shouldBypass = true;
+        }
+        
+        // Check LuckPerms roles if enabled and LuckPerms is available
+        if (!shouldBypass && ClientIDServer.getInstance().getConfig().getBoolean("checkLuckPerms", false)) {
+            if (LuckPermsUtils.isLuckPermsAvailable() && LuckPermsUtils.hasBypassRole(player)) {
+                shouldBypass = true;
+            }
+        }
+        
+        // Check if player is Geyser (Bedrock) player
+        if (isGeyser) {
+            shouldBypass = true;
+        }
+        
+        if (shouldBypass) {
             ClientIDServer.getInstance().confirmedPlayers.add(player);
             ClientIDServer.getInstance().modConfirmation.put(player, true);
             return;
